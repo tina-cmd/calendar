@@ -53,6 +53,21 @@
         Sign in
       </button>
     </div>
+
+    <Transition name="modal">
+      <div v-if="show" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 w-full">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md transform transition-all duration-300 ease-out">
+          <h3 class="text-2xl font-semibold text-yellow-800 mb-4">{{ messageTitle }}</h3>
+          <p class="mb-4">{{ message }}</p>
+          <div class="flex justify-end">
+            <button @click="close()"
+              class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
   </form>
 </template>
 
@@ -61,6 +76,7 @@ import { useForm } from '@inertiajs/vue3';
 import { MailIcon, LockIcon } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { onMounted } from 'vue';
+import DOMPurify from 'dompurify';
 
 const form = useForm({
   email: '',
@@ -69,6 +85,21 @@ const form = useForm({
 });
 
 const err = ref(null);
+const show = ref(false);
+const message = ref(null);
+const messageTitle = ref(null);
+
+const showWarning = (text, title) => {
+  show.value = true;
+  message.value = text;
+  messageTitle.value = title;
+}
+
+const close = () => {
+  show.value = false;
+  message.value = '';
+  messageTitle.value = '';
+}
 
 const handleLogin = () => {
   form.post('/login', {
@@ -77,7 +108,7 @@ const handleLogin = () => {
     },
     onError: (errors) => {
       err.value = errors.email;
-      alert(err.value);
+      showWarning(err.value, 'Warning');
     },
   });
   form.reset();

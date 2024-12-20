@@ -30,7 +30,7 @@
                 <LoginComponent />
             </template>
             <template v-else>
-                <RegisterComponent />
+                <RegisterComponent @registerSuccess="currentComponent = 'login'" />
             </template>
         </Transition>
       </div>
@@ -59,13 +59,6 @@
 
   const currentComponent = ref('login');
 
-  onMounted(() => {
-    // if(props.warning != null) {
-    //   alert(props.warning);
-    // }else if(props.success != null) {
-    //   alert(props.success);
-    // }
-  });
 
   </script>
   

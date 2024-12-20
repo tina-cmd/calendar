@@ -4,7 +4,13 @@ use App\Http\Controllers\NavigateController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 
+
+Route::get('/migrate', function () {
+    Artisan::call('migrate');
+    return 'Migrations ran successfully!';
+});
 Route::get('/', [NavigateController::class, 'index'])->name('home');
 Route::post('/login', [AuthController::class, 'authenticate'])->name('login');
 Route::post('/register', [AuthController::class, 'register'])->name('register');

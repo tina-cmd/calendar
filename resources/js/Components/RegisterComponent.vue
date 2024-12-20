@@ -7,16 +7,9 @@
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <UserIcon class="h-5 w-5 text-gray-400" />
         </div>
-        <input 
-          v-model="form.name" 
-          @input="sanitizeInput('name'); checkFormFields()"
-          type="text" 
-          id="name" 
-          required 
+        <input v-model="form.name" @input="sanitizeInput('name'); checkFormFields()" type="text" id="name" required
           class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          placeholder="John Doe"
-          maxlength="30"
-        >
+          placeholder="John Doe" maxlength="30">
       </div>
     </div>
 
@@ -27,16 +20,9 @@
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <MailIcon class="h-5 w-5 text-gray-400" />
         </div>
-        <input 
-          v-model="form.email" 
-          @input="sanitizeInput('email'); checkFormFields()"
-          type="email" 
-          id="email" 
-          required 
+        <input v-model="form.email" @input="sanitizeInput('email'); checkFormFields()" type="email" id="email" required
           class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          placeholder="you@example.com"
-          maxlength="30"
-        >
+          placeholder="you@example.com" maxlength="30">
       </div>
     </div>
 
@@ -47,16 +33,10 @@
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <LockIcon class="h-5 w-5 text-gray-400" />
         </div>
-        <input 
-          v-model="form.password" 
-          @input="sanitizeInput('password'); validatePassword(); checkFormFields()"
-          type="password" 
-          id="password" 
-          required 
+        <input v-model="form.password" @input="sanitizeInput('password'); validatePassword(); checkFormFields()"
+          type="password" id="password" required
           class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          placeholder="••••••••"
-          maxlength="20"
-        >
+          placeholder="••••••••" maxlength="20">
       </div>
       <!-- Password Error Message -->
       <div v-if="passwordError" class="text-sm text-red-500 mt-1">{{ passwordError }}</div>
@@ -69,34 +49,42 @@
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <LockIcon class="h-5 w-5 text-gray-400" />
         </div>
-        <input 
-          v-model="form.passwordConfirmation" 
-          @input="sanitizeInput('passwordConfirmation'); checkPasswordsMatch(); checkFormFields()"
-          type="password" 
-          id="password_confirmation" 
-          required 
+        <input v-model="form.passwordConfirmation"
+          @input="sanitizeInput('passwordConfirmation'); checkPasswordsMatch(); checkFormFields()" type="password"
+          id="password_confirmation" required
           class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          placeholder="••••••••"
-          maxlength="20"
-        >
+          placeholder="••••••••" maxlength="20">
       </div>
       <!-- Dynamic confirmation message -->
       <div v-if="passwordConfirmationError" class="text-sm text-red-500 mt-1">{{ passwordConfirmationError }}</div>
       <div v-else-if="passwordsMatch" class="text-sm text-green-500 mt-1">Passwords match</div>
     </div>
 
+    <Transition name="modal">
+      <div v-if="show" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 w-full">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md transform transition-all duration-300 ease-out">
+          <h3 class="text-2xl font-semibold text-yellow-800 mb-4">{{ messageTitle }}</h3>
+          <p class="mb-4">{{ message }}</p>
+          <div class="flex justify-end">
+            <button @click="close"
+              class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105">
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+
     <!-- Submit Button -->
     <div>
-      <button
-        :disabled="isDisabled"
-        id="submit"
-        type="submit" 
-        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-gray-400 disabled:text-gray-600"
-      >
+      <button :disabled="isDisabled" id="submit" type="submit"
+        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-gray-400 disabled:text-gray-600">
         Create Account
       </button>
     </div>
   </form>
+
+
 </template>
 
 <script setup>
@@ -104,6 +92,7 @@ import { ref } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import { UserIcon, MailIcon, LockIcon } from 'lucide-vue-next';
 import DOMPurify from 'dompurify'; // Import DOMPurify for sanitization
+import { defineEmits } from 'vue';
 
 const form = useForm({
   name: '',
@@ -112,10 +101,34 @@ const form = useForm({
   password_confirmation: '',
 });
 
+
 const passwordError = ref(null);
 const passwordConfirmationError = ref(null);
 const passwordsMatch = ref(false);
 const isDisabled = ref(true);
+const show = ref(false);
+const message = ref(null);
+const messageTitle = ref(null);
+const emit = defineEmits();
+
+const showWarning = (text, title) => {
+  show.value = true;
+  message.value = text;
+  messageTitle.value = title;
+}
+
+const close = () => {
+  if(messageTitle.value === 'Success') {
+    show.value = false;
+  message.value = '';
+  messageTitle.value = '';
+    emit('registerSuccess');
+  }
+
+  show.value = false;
+  message.value = '';
+  messageTitle.value = '';
+}
 
 // Sanitize input fields
 const sanitizeInput = (field) => {
@@ -174,12 +187,12 @@ const handleRegister = () => {
   form.password = DOMPurify.sanitize(form.password);
   form.password_confirmation = DOMPurify.sanitize(form.passwordConfirmation);
 
-  if(form.password !== form.password_confirmation) {
-    alert('Passwords do not match');
+  if (form.password !== form.password_confirmation) {
+    showWarning('Passwords do not match', 'Warning');
   } else {
     form.post('/register', {
       onSuccess: () => {
-        alert('Account created successfully! You can now login.');
+        showWarning('Account created successfully! You can now login.', 'Success');
       },
     });
   }
