@@ -1,8 +1,6 @@
 {
   "version": 2,
-  "build": {
-    "outputDirectory": "public/build"
-  },
+  "outputDirectory": "public/build",
   "functions": {
     "api/index.php": {
       "runtime": "vercel-php@0.7.0"
