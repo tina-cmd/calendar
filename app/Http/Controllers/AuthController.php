@@ -13,23 +13,49 @@ use Illuminate\Support\Facades\DB;
 class AuthController extends Controller
 {
     public function register(Request $request)
-    {
+{
+    try {
         // Validate the incoming request data
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email|max:255',
-            'password' => 'required|string|min:8|confirmed', // Password confirmation field should be 'password_confirmation'
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                'regex:/[!@#$%^&*(),.?":{}|<>]/' // Requires at least one special character
+            ],
+            'password_confirmation' => 'required'
+        ], [
+            'password.regex' => 'Password must contain at least one special character.'
         ]);
 
         // Create the user
         $user = User::create([
-            'name' => e($validatedData['name']), // Escape special characters
+            'name' => e($validatedData['name']),
             'email' => e($validatedData['email']),
-            'password' => Hash::make($validatedData['password']), // Hash the password
+            'password' => Hash::make($validatedData['password']),
         ]);
 
+        // Log the user in after registration
+        Auth::login($user);
+        
+        // Regenerate session
+        $request->session()->regenerate();
+
         return redirect()->route('get.todolist');
+
+    } catch (ValidationException $e) {
+        return back()
+            ->withErrors($e->errors())
+            ->withInput($request->except('password', 'password_confirmation'));
+    } catch (\Exception $e) {
+        return back()
+            ->withErrors(['error' => 'Registration failed. Please try again.'])
+            ->withInput($request->except('password', 'password_confirmation'));
     }
+}
 
     /**
      * Handle user login.
